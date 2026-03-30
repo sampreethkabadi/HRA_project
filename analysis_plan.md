@@ -2,21 +2,14 @@
 
 ---
 
-## What Are We Even Looking At?
 
-Before diving into the plan, let's break down what this data actually is and why it exists.
+### Overview
 
-### The Big Picture
-
-Indiana University's CNS Center built a set of web tools called the **Human Reference Atlas (HRA)**. Think of the HRA as Google Maps — but instead of mapping cities, it maps the human body all the way down to individual cell types. Researchers use it to register tissue samples, explore organs in 3D, and analyze cell neighborhoods.
-
-These tools live on the internet at **humanatlas.io**. Every time someone visits a webpage or clicks a button on the internet, that action leaves a digital footprint. Amazon CloudFront is the service that sits between users and the website — it's like the front desk of a hotel that logs every guest who comes in and what they asked for.
+Indiana University's CNS Center built a set of web tools called the **Human Reference Atlas (HRA)** (**humanatlas.io**). The web tools are used to register tissue samples, explore organs in 3D, and analyze cell neighborhoods.
 
 CNS configured CloudFront to capture two kinds of logs:
 1. **Standard server logs** — every file requested (images, pages, PDFs)
 2. **Custom event logs** — specific user actions like "clicked this button" or "searched for this organ"
-
-We have both kinds.
 
 ---
 
@@ -24,22 +17,22 @@ We have both kinds.
 
 ### Dataset 1: CNS Website Logs (`2026-033-23_cns-logs.parquet`)
 
-**What it is:** A record of every request made to **cns.iu.edu** — the CNS Center's main academic website — from 2008 to March 2026. Think of it as a guest book for the website: every visit, every file download, every page load got an entry.
+**Description:** A record of every request made to the CNS Center's main academic website, **cns.iu.edu**, from 2008 to March 2026.
 
-**Size:** ~16.3 million rows
+**Size:** ~16.3 million rows, with each row representing one HTTP request.
 
-**What each row means:** One HTTP request. If you open a webpage that loads 20 images, that's 21 rows (1 for the page + 20 for the images).
+**Note**: If a webpage that loads 20 images, that is 21 rows (1 for the page + 20 for the images).
 
-**Key things it tells us:**
+**Key Information:**
 - Which pages and files people downloaded (PDFs, presentations, etc.)
 - Where visitors came from geographically
 - Whether the visitor was a real human or a bot
 - What website sent them here (referrer)
 - When traffic peaked over 18 years
 
-**What it does NOT tell us:** Anything about button clicks inside the HRA tools (RUI, EUI, CDE). This is just the CNS homepage, not the HRA app.
+**Limitation:** Does not include information about button clicks inside the HRA tools (RUI, EUI, CDE).
 
-**Key columns to know:**
+**Key Columns:**
 
 | Column | Plain English |
 |---|---|
@@ -55,7 +48,7 @@ We have both kinds.
 
 ### Dataset 2: HRA Portal Logs (`2026-01-13_hra-logs.parquet`)
 
-**What it is:** A record of every request and user interaction across the entire HRA ecosystem — the portal, the tools, the APIs — from June 2023 to January 2026.
+**Description:** A record of every request and user interaction across the entire HRA ecosystem (the portal, the tools, the APIs) from June 2023 to January 2026.
 
 **Size:** ~12.8 million rows
 
@@ -82,7 +75,7 @@ Every time a user does something meaningful in an HRA app (clicks a button, hove
 
 This translates to: *"User in session abc123, using the RUI app, clicked the Register button."*
 
-**Key columns for the Events data:**
+**Key Columns for Events:**
 
 | Column | Plain English |
 |---|---|
@@ -98,13 +91,13 @@ This translates to: *"User in session abc123, using the RUI app, clicked the Reg
 
 ---
 
-## The 5 Client Questions — Analysis Plan
+## The 5 Client Questions: Analysis Plan
 
 ---
 
 ### Question 1: What is the distribution of frequency of user events?
 
-**Plain English:** How often does each type of user action happen? Are users mostly clicking, or hovering, or hitting errors? And how is activity spread — do a few users do everything, or is usage spread across many people?
+**Critical Question(s):** How often does each type of user action happen? Are users mostly clicking, or hovering, or hitting errors? And how is activity spread — do a few users do everything, or is usage spread across many people?
 
 ---
 
@@ -128,9 +121,9 @@ This translates to: *"User in session abc123, using the RUI app, clicked the Reg
 
 ---
 
-#### Plan for CNS Logs (complementary answer)
+#### Plan for CNS Logs
 
-The CNS logs don't have UI events — every row is just a file/page request. So "event frequency" here means request frequency.
+The CNS logs don't have UI events. Every row is just a file/page request. So "event frequency" here means request frequency.
 
 **Data source:** Full file, filtered to `traffic_type == 'Likely Human'`
 
@@ -148,7 +141,7 @@ The CNS logs don't have UI events — every row is just a file/page request. So 
 
 ### Question 2: Which UI elements were used frequently and not frequently?
 
-**Plain English:** Which buttons and features do users actually click? Are there things that were built but nobody ever touches?
+**Critical Question(s):** Which buttons and features do users actually click? Are there things that were built but nobody ever touches?
 
 ---
 
@@ -171,7 +164,7 @@ The CNS logs don't have UI events — every row is just a file/page request. So 
 
 ---
 
-#### Plan for CNS Logs (complementary answer)
+#### Plan for CNS Logs
 
 Here "UI elements" = pages and resources on the CNS website.
 
@@ -192,11 +185,11 @@ Here "UI elements" = pages and resources on the CNS website.
 
 ### Question 3: How often was opacity changed in the RUI?
 
-**Plain English:** The RUI (Registration User Interface) lets users toggle the transparency of organs and anatomical structures so they can see inside the 3D body model. Did users actually use this feature?
+**Critical Question(s):** The RUI (Registration User Interface) lets users toggle the transparency of organs and anatomical structures so they can see inside the 3D body model. Did users actually use this feature?
 
 ---
 
-#### Plan for HRA Logs (primary answer)
+#### Plan for HRA Logs
 
 **Data source:** `Events` site, `app == 'ccf-rui'` rows
 
@@ -217,7 +210,7 @@ Here "UI elements" = pages and resources on the CNS website.
 
 ---
 
-#### Plan for CNS Logs (not directly applicable)
+#### Plan for CNS Logs
 
 The CNS logs don't contain RUI interaction data. However, we can look at downloads of the RUI paper as a proxy for interest in the RUI:
 
@@ -228,7 +221,7 @@ The CNS logs don't contain RUI interaction data. However, we can look at downloa
 
 ### Question 4: How often was spatial search used in the EUI?
 
-**Plain English:** The EUI (Exploration User Interface) has a feature called Spatial Search — users can drop a 3D sphere into a body organ and find all registered tissue samples that overlap with it. Did people actually use this? How far did they get through the workflow?
+**Critical Question(s):** The EUI (Exploration User Interface) has a feature called Spatial Search — users can drop a 3D sphere into a body organ and find all registered tissue samples that overlap with it. Did people actually use this? How far did they get through the workflow?
 
 ---
 
@@ -256,7 +249,7 @@ The CNS logs don't contain RUI interaction data. However, we can look at downloa
 
 ---
 
-#### Plan for CNS Logs (complementary)
+#### Plan for CNS Logs
 
 Count downloads of the EUI paper as interest proxy:
 - `/docs/publications/2021-Borner_Tissue-Registration-and-EUIs.pdf` (1,993 downloads)
@@ -266,7 +259,7 @@ Count downloads of the EUI paper as interest proxy:
 
 ### Question 5: How often were histograms and violin plots in the CDE downloaded?
 
-**Plain English:** The CDE (Cell Distance Explorer) generates charts — histograms and violin plots — showing how different cell types are distributed in space. After generating these charts, users can download them. How often did that happen?
+**Critical Question(s):** The CDE (Cell Distance Explorer) generates charts — histograms and violin plots — showing how different cell types are distributed in space. After generating these charts, users can download them. How often did that happen?
 
 ---
 
@@ -329,11 +322,11 @@ For HRA logs — Events only (site == 'Events'):
 
 | Question | HRA Logs | CNS Logs |
 |---|---|---|
-| Q1: Event frequency distribution | ✅ Full answer | ✅ Page-request proxy |
-| Q2: Frequently/rarely used UI elements | ✅ Full answer | ✅ Page-level only |
-| Q3: Opacity changes in RUI | ✅ Full answer (206 events) | ❌ Not available |
-| Q4: Spatial search in EUI | ✅ Full answer (3,071 events) | ❌ Not available |
-| Q5: CDE histogram/violin downloads | ⚠️ Tracking gap — not instrumented | ❌ Not available |
+| Q1: Event frequency distribution | Full answer | Page-request proxy |
+| Q2: Frequently/rarely used UI elements | Full answer | Page-level only |
+| Q3: Opacity changes in RUI | Full answer (206 events) | Not available |
+| Q4: Spatial search in EUI | Full answer (3,071 events) | Not available |
+| Q5: CDE histogram/violin downloads | Tracking gap — not instrumented | Not available |
 
 ---
 
