@@ -55,6 +55,78 @@ Both files share the same 40-column schema (minor column name casing differences
 
 ---
 
+## Column Explanations with Examples
+
+### Identity & Time
+
+| Column | What it means | Example |
+|---|---|---|
+| `anon_id` | A scrambled ID to track a user without storing their real identity | `"a3f9c2..."` |
+| `date` | The date of the request | `"2025-01-05"` |
+| `time` | The time of the request | `"14:32:07"` |
+| `timestamp` | Same moment, expressed as seconds since Jan 1, 1970 (standard machine format) | `1736087527` |
+| `timestamp_ms` | Same but in milliseconds — more precise | `1736087527413` |
+| `year`, `month`, `day` | The date broken into separate pieces for easier filtering | `2025`, `1`, `5` |
+
+### What Was Requested
+
+| Column | What it means | Example |
+|---|---|---|
+| `cs_uri_stem` | The page or file path the user asked for | `"/docs/publications/paper.pdf"` |
+| `cs_uri_query` | Extra parameters tacked onto the URL | `"?page=2&lang=en"` |
+| `query` | Same query string, but parsed into key-value pairs | `[("page","2"), ("lang","en")]` |
+| `cs_method` | Whether the browser was fetching data (GET) or submitting something (POST) | `"GET"` |
+| `sc_status` | The server's response code — 200 means success, 404 means not found | `200` |
+| `cs_protocol` | HTTP or HTTPS (secure vs. not) | `"HTTPS"` |
+| `cs_protocol_version` | The version of the HTTP protocol used | `"HTTP/2.0"` |
+
+### Who Visited
+
+| Column | What it means | Example |
+|---|---|---|
+| `cs_user_agent` | Identifies the browser or bot that made the request | `"Mozilla/5.0 (Chrome/131)"` |
+| `traffic_type` | A label classifying the visitor as human, bot, or AI crawler | `"Likely Human"` |
+| `c_country` | Where the visitor is from, as a 2-letter country code | `"US"`, `"DE"`, `"IN"` |
+| `referrer` | The cleaned domain they came from (what site linked them here) | `"google.com"` |
+| `cs_referer` | The full, raw Referer header as the browser sent it | `"https://www.google.com/search?q=..."` |
+| `cs_cookie` | Any cookie data sent with the request | `"session=abc123"` |
+
+### Size & Speed
+
+| Column | What it means | Example |
+|---|---|---|
+| `sc_bytes` | How many bytes the server sent back (response size) | `52400` (≈ 51 KB) |
+| `cs_bytes` | How many bytes the user's browser sent (request size, usually small) | `512` |
+| `time_taken` | Total time from request to response completing | `0.34` (seconds) |
+| `time_to_first_byte` | How long until the server started sending data back | `0.12` (seconds) |
+| `sc_content_type` | The type of file/data returned | `"application/pdf"`, `"text/html"` |
+| `sc_content_len` | The declared size of the response content | `52400` |
+| `sc_range_start` / `sc_range_end` | If only part of a file was requested (e.g. resuming a download), the byte range | `0` / `10240` |
+
+### CloudFront / Server Infrastructure
+
+These columns come from AWS CloudFront, the content delivery network (CDN) that serves the website from servers around the world.
+
+| Column | What it means | Example |
+|---|---|---|
+| `x_edge_location` | Code for the CloudFront server that handled the request | `"ORD52-C1"` |
+| `airport` | Human-readable airport code for that edge location | `"ORD"` (Chicago O'Hare) |
+| `x_host_header` | The domain the browser thought it was talking to | `"humanatlas.io"` |
+| `x_edge_result_type` | Whether the file was served from cache or fetched fresh | `"Hit"`, `"Miss"`, `"Error"` |
+| `x_edge_response_result_type` | Similar — the edge's response classification | `"Hit"` |
+| `x_edge_detailed_result_type` | More specific version of the above | `"OriginShieldHit"` |
+| `x_edge_request_id` | A unique ID for this specific request (useful for debugging) | `"abc123XYZ..."` |
+| `ssl_protocol` | The encryption standard used for HTTPS | `"TLSv1.3"` |
+| `ssl_cipher` | The specific encryption algorithm negotiated | `"ECDHE-RSA-AES128-GCM-SHA256"` |
+| `distribution` | Which CloudFront distribution served the file | `"hra"`, `"cns"` |
+| `site` | A human-readable label for the website | `"HRA"`, `"CNS"` |
+
+### Example Row (putting it all together)
+
+> On Jan 5, 2025 at 2:32 PM, a visitor from Germany (`c_country = "DE"`) came from Google (`referrer = "google.com"`) and downloaded a PDF (`cs_uri_stem = "/docs/publications/paper.pdf"`, `sc_content_type = "application/pdf"`). They were classified as a human (`traffic_type = "Likely Human"`), the file was 51 KB (`sc_bytes = 52400`), and the server responded in 0.34 seconds (`time_taken = 0.34`). The request was served from the Chicago CloudFront node (`airport = "ORD"`) with a cache hit (`x_edge_result_type = "Hit"`).
+
+---
+
 ## File 1: `2026-033-23_cns-logs.parquet` — CNS Website Logs
 
 ### Traffic Composition
