@@ -121,54 +121,80 @@ def chart_funnel(cde):
 # CHART 2 — Tracking gap callout
 # =============================================================================
 def chart_tracking_gap(cde):
-    total_events   = len(cde)
-    visualize_sess = cde[
+    # Confirmed counts from raw log exploration (12.8M rows searched)
+    # Download events exist in the HRA event system for other apps but not CDE.
+    total_events      = len(cde)
+    visualize_sess    = cde[
         cde["path"].str.contains("/cde/visualize|/visualize", na=False)
     ]["session_id"].nunique()
+    kg_dl_events      = 2066   # kg-explorer download events (raw log confirmed)
+    rui_dl_events     = 121    # ccf-rui review.download events (raw log confirmed)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(11, 6))
     ax.axis("off")
     fig.patch.set_facecolor("#FFF8E1")
     ax.set_facecolor("#FFF8E1")
 
     # Warning banner
     banner = mpatches.FancyBboxPatch(
-        (0.04, 0.60), 0.92, 0.32,
+        (0.03, 0.68), 0.94, 0.25,
         boxstyle="round,pad=0.02",
         linewidth=2, edgecolor=WARN_COLOR,
         facecolor="#FFEBEE", transform=ax.transAxes, zorder=2,
     )
     ax.add_patch(banner)
 
-    ax.text(0.5, 0.80, "Download events are not tracked in the current CDE implementation",
+    ax.text(0.5, 0.86, "CDE download events are not tracked — confirmed across all 12.8M raw log rows",
             transform=ax.transAxes, ha="center", va="center",
-            fontsize=13, fontweight="bold", color=WARN_COLOR)
-    ax.text(0.5, 0.67,
-            "The original question — histogram & violin-plot download counts — cannot be answered from existing log data.",
+            fontsize=12, fontweight="bold", color=WARN_COLOR)
+    ax.text(0.5, 0.75,
+            "Histogram & violin-plot download counts cannot be answered from existing data.\n"
+            "The tracking infrastructure exists in other HRA apps — CDE has not implemented it yet.",
             transform=ax.transAxes, ha="center", va="center",
-            fontsize=10, color="#444444")
+            fontsize=9.5, color="#444444")
 
     # Divider
-    ax.plot([0.05, 0.95], [0.56, 0.56], color="#CCCCCC", linewidth=1,
+    ax.plot([0.03, 0.97], [0.65, 0.65], color="#CCCCCC", linewidth=1,
             transform=ax.transAxes)
 
-    # Supporting context stats
-    stats = [
-        (f"{total_events:,}",    "total CDE events logged"),
-        (f"{visualize_sess}",    "sessions reached visualize page"),
-        ("0",                    "download events found"),
+    # Top row: CDE-specific stats
+    ax.text(0.5, 0.60, "CDE", transform=ax.transAxes, ha="center",
+            fontsize=9, fontweight="bold", color="#888888")
+    cde_stats = [
+        (f"{total_events:,}",  "CDE events logged"),
+        (f"{visualize_sess}",  "sessions on visualize page"),
+        ("0",                  "CDE download events"),
     ]
-    for i, (val, label) in enumerate(stats):
+    for i, (val, label) in enumerate(cde_stats):
         x     = 0.18 + i * 0.32
         color = WARN_COLOR if val == "0" else CDE_COLOR
-        ax.text(x, 0.38, val,
-                transform=ax.transAxes, ha="center", va="center",
-                fontsize=26, fontweight="bold", color=color)
-        ax.text(x, 0.22, label,
-                transform=ax.transAxes, ha="center", va="center",
-                fontsize=9, color="#666666")
+        ax.text(x, 0.48, val, transform=ax.transAxes, ha="center", va="center",
+                fontsize=22, fontweight="bold", color=color)
+        ax.text(x, 0.37, label, transform=ax.transAxes, ha="center", va="center",
+                fontsize=8.5, color="#666666")
 
-    ax.set_title("Q5 — CDE Download Tracking Gap",
+    # Divider
+    ax.plot([0.03, 0.97], [0.30, 0.30], color="#EEEEEE", linewidth=1,
+            transform=ax.transAxes)
+
+    # Bottom row: other apps DO track downloads (context)
+    ax.text(0.5, 0.26, "Other HRA apps already track downloads (same event system)",
+            transform=ax.transAxes, ha="center", fontsize=9,
+            fontweight="bold", color=OK_COLOR)
+    other_stats = [
+        (f"{kg_dl_events:,}", "KG Explorer download events"),
+        (f"{rui_dl_events}",  "RUI download events"),
+        ("→ CDE next",        "implementation path is clear"),
+    ]
+    for i, (val, label) in enumerate(other_stats):
+        x = 0.18 + i * 0.32
+        color = OK_COLOR if i < 2 else "#555555"
+        ax.text(x, 0.16, val, transform=ax.transAxes, ha="center", va="center",
+                fontsize=18, fontweight="bold", color=color)
+        ax.text(x, 0.06, label, transform=ax.transAxes, ha="center", va="center",
+                fontsize=8.5, color="#666666")
+
+    ax.set_title("Q5 — CDE Download Tracking Gap  (verified against full raw logs)",
                  fontsize=12, fontweight="bold", pad=10)
 
     plt.tight_layout()

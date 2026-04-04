@@ -218,13 +218,14 @@ Brief talking points for each chart. Organized by client question.
 
 ### q5_2 — Download Tracking Gap (Callout)
 
-**What it shows:** A clear statement of a data gap: the original question cannot be answered from existing logs.
+**What it shows:** A verified statement of a data gap, confirmed by searching all 12.8M raw HRA log rows — not just the preprocessed files.
 
 **Key talking points:**
-- Despite **4,294 CDE events logged** and **35 sessions reaching the Visualize page**, there are **0 download events** in the data.
-- Download interactions on the histogram and violin-plot charts are simply not being tracked.
-- This is an important finding to surface honestly — the client may not realize this gap exists.
-- It is also an opportunity: adding tracking now means the question can be answered in the next data collection cycle.
+- Despite **4,294 CDE events logged** and **35 sessions reaching the Visualize page**, there are **0 CDE download events** anywhere in the raw data.
+- This was verified by searching every row of the full 12.8M-row HRA log — not a sampling limitation or preprocessing artifact.
+- Crucially, **the tracking infrastructure already works**: KG Explorer logged **2,066 download events** and RUI logged **121** in the same dataset, using the same event system.
+- The gap is CDE-specific — the team simply hasn't wired up download tracking for the histogram and violin-plot components yet.
+- This reframes the finding from "data is missing" to "the fix is well-scoped and low-risk to implement."
 
 ---
 
@@ -260,5 +261,5 @@ Brief talking points for each chart. Organized by client question.
 | q4_2 | Q4 | Horizontal bar | Kidney (L) most selected organ |
 | q4_3 | Q4 | Stat card | 0.6% of EUI sessions use keyboard navigation |
 | q5_1 | Q5 | Funnel | 175 → 33 sessions; 57% drop at landing |
-| q5_2 | Q5 | Callout | 0 download events tracked in CDE |
+| q5_2 | Q5 | Callout | 0 CDE downloads in 12.8M rows; KG/RUI already track downloads |
 | q5_3 | Q5 | Table | 2 high-priority events to add for Q5 |
