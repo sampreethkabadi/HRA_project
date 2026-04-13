@@ -1,0 +1,114 @@
+Metadata-Version: 2.4
+Name: humanatlas-dashboard
+Version: 0.1.0
+Summary: Dashboard and analysis pipeline for Human Atlas interaction telemetry.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: duckdb>=1.1.0
+Requires-Dist: pandas>=2.2.0
+Requires-Dist: plotly>=5.24.0
+Requires-Dist: pyarrow>=17.0.0
+Requires-Dist: pyyaml>=6.0.2
+Requires-Dist: streamlit>=1.39.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+
+# Human Atlas Research Dashboard
+
+This repository contains a reproducible dashboard stack for exploring Human Atlas telemetry stored in parquet and queried through DuckDB. It is designed around six analysis areas:
+
+1. Distribution of event frequency
+2. Frequently and infrequently used UI elements
+3. Opacity changes in the RUI
+4. Spatial search usage in the EUI
+5. Histogram and violin plot downloads in the CDE
+6. Performance and cache behavior across apps
+
+The implementation uses:
+
+- `DuckDB` as the analytical storage/query layer
+- `Parquet` as the raw data format
+- `Streamlit` for the dashboard website
+- `Plotly` for interactive charts
+- Reusable Python scripts for data generation and database setup
+
+## Why this stack
+
+This project needs to be reproducible, fast to iterate on, and easy to hand off. A Python-first stack is a better fit than starting in Power BI because:
+
+- the same query layer can be reused in notebooks, scripts, and the dashboard
+- parquet and DuckDB scale cleanly for event telemetry
+- documentation, transformation logic, and visualization code stay in the same repository
+- Power BI can still be layered on later by pointing it to DuckDB exports or derived parquet tables
+
+## Project Structure
+
+```text
+app/                     Streamlit entrypoint
+config/                  Dataset and column mapping config
+data/                    Raw parquet, DuckDB file, exports
+docs/                    Layout, architecture, and replication docs
+scripts/                 Mock data generation and DuckDB setup
+src/humanatlas_dashboard Core config, querying, charting, and section rendering
+tests/                   Basic pipeline tests
+```
+
+## Quickstart
+
+### 1. Install dependencies
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### 2. Generate sample parquet data
+
+```bash
+python3 scripts/generate_mock_data.py --config config/humanatlas.yml
+```
+
+### 3. Build the DuckDB database
+
+```bash
+python3 scripts/build_duckdb.py --config config/humanatlas.yml
+```
+
+### 4. Launch the dashboard
+
+```bash
+streamlit run app/dashboard.py -- --config config/humanatlas.yml
+```
+
+## Using real Human Atlas data
+
+Replace the parquet paths and column mappings in [config/humanatlas.yml](/Users/cinhtw/Documents/Playground/config/humanatlas.yml). The app expects:
+
+- one parquet dataset for user interaction events
+- one parquet dataset for performance/cache telemetry
+
+If the original raw schema differs, update the `columns` mappings instead of rewriting the dashboard code.
+
+## Documentation
+
+- [Architecture](/Users/cinhtw/Documents/Playground/docs/architecture.md)
+- [Dashboard Layout](/Users/cinhtw/Documents/Playground/docs/dashboard-layout.md)
+- [Replication Guide](/Users/cinhtw/Documents/Playground/docs/replication-guide.md)
+
+## Dashboard Behavior
+
+The dashboard provides:
+
+- global filters for app and date range
+- one section per research question
+- KPI cards plus multiple visualizations per question
+- a dedicated performance tab focused on cache behavior and latency
+
+## Power BI note
+
+Power BI is possible, but it should be downstream from this repository rather than the primary implementation. Recommended approach:
+
+1. Use this repo to define the canonical cleaned views in DuckDB.
+2. Export aggregate tables if the client wants Power BI for executive reporting.
+3. Keep research-grade exploratory analysis in the Python dashboard where iteration is faster.
