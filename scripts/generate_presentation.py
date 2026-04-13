@@ -204,7 +204,7 @@ def main() -> None:
     prs.slide_height = Inches(7.5)
     prs.core_properties.title = "Human Reference Atlas Dashboard - Analysis & Recommendations"
     prs.core_properties.subject = "Client presentation based on the HRA dashboard analysis"
-    prs.core_properties.author = "OpenAI Codex"
+    prs.core_properties.author = "HRA Project Team"
 
     first = SLIDES[0]
     add_title_slide(prs, first["title"], first["subtitle"])

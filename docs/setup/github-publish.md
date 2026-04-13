@@ -13,12 +13,12 @@ That means you can create a local branch immediately, but you cannot push until 
 
 Use:
 
-`codex/hra-dashboard-deliverables`
+`hra-dashboard-deliverables`
 
 ## Local branch creation
 
 ```bash
-git switch -c codex/hra-dashboard-deliverables
+git switch -c hra-dashboard-deliverables
 ```
 
 ## Stage and commit
@@ -51,14 +51,14 @@ git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
 ## Push the branch
 
 ```bash
-git push -u origin codex/hra-dashboard-deliverables
+git push -u origin hra-dashboard-deliverables
 ```
 
 ## Open a pull request
 
 After pushing, open GitHub and create a pull request from:
 
-- head branch: `codex/hra-dashboard-deliverables`
+- head branch: `hra-dashboard-deliverables`
 - base branch: usually `main`
 
 ## If you want to keep the repo clean
