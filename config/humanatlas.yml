@@ -1,0 +1,20 @@
+database:
+  duckdb_path: data/processed/hra_analytics.duckdb
+
+datasets:
+  hra_logs_parquet: Data/2026-01-13_hra-logs.parquet
+
+filters:
+  excluded_traffic_types:
+    - Bot
+    - AI-Assistant / Bot
+
+performance:
+  app_segments:
+    kg-explorer: KG Explorer
+    asctb-reporter: ASCT+B Reporter
+    cde: CDE
+    eui: EUI
+    rui: RUI
+    dashboard: Dashboard
+    ftu-explorer: FTU Explorer

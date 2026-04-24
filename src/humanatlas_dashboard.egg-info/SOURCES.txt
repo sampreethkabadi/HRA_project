@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/humanatlas_dashboard/__init__.py
+src/humanatlas_dashboard/charts.py
+src/humanatlas_dashboard/config.py
+src/humanatlas_dashboard/data_access.py
+src/humanatlas_dashboard/duckdb_builder.py
+src/humanatlas_dashboard/sections.py
+src/humanatlas_dashboard.egg-info/PKG-INFO
+src/humanatlas_dashboard.egg-info/SOURCES.txt
+src/humanatlas_dashboard.egg-info/dependency_links.txt
+src/humanatlas_dashboard.egg-info/requires.txt
+src/humanatlas_dashboard.egg-info/top_level.txt
+tests/test_pipeline.py

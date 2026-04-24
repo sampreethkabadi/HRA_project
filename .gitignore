@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.streamlit/
+*.pyc
+*.pyo
+*.pyd
+*.duckdb
+*.wal
+data/raw/*.parquet
+data/processed/*.duckdb
+data/processed/*.wal
+data/exports/*
+!data/exports/.gitkeep
+FlowGuard-revamp-app-with-local-algo/
+data/
