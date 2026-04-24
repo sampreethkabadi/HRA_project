@@ -2,7 +2,7 @@ database:
   duckdb_path: data/processed/hra_analytics.duckdb
 
 datasets:
-  hra_logs_parquet: /Users/cinhtw/Downloads/2026-01-13_hra-logs.parquet
+  hra_logs_parquet: Data/2026-01-13_hra-logs.parquet
 
 filters:
   excluded_traffic_types:

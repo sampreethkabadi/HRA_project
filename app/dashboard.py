@@ -59,10 +59,12 @@ def main() -> None:
     filter_options = repository.get_filter_options()
     with st.sidebar:
         st.markdown("### Global Filters")
+        core_apps = ["ccf-eui", "ccf-rui", "cde-ui", "kg-explorer"]
+        default_apps = [app for app in core_apps if app in filter_options.apps]
         selected_apps = st.multiselect(
             "Event apps",
             options=filter_options.apps,
-            default=filter_options.apps,
+            default=default_apps,
         )
         date_range = st.date_input(
             "Date range",
