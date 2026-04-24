@@ -13,3 +13,4 @@ data/processed/*.wal
 data/exports/*
 !data/exports/.gitkeep
 FlowGuard-revamp-app-with-local-algo/
+data/
