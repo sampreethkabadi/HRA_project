@@ -221,25 +221,6 @@ All dashboard data excludes bot and AI-assistant traffic to focus on genuine hum
 python3 scripts/generate_presentation.py
 ```
 
-This writes the client deck to:
-
-- [hra_dashboard_client_presentation.pptx](/Users/cinhtw/Documents/Playground/deliverables/presentation/hra_dashboard_client_presentation.pptx)
-
-## Deliverables
-
-- [Client analysis report](/Users/cinhtw/Documents/Playground/deliverables/report/hra_analysis_recommendations_report.md)
-- [Presentation source](/Users/cinhtw/Documents/Playground/deliverables/presentation/hra_dashboard_client_presentation.md)
-- [Presentation deck](/Users/cinhtw/Documents/Playground/deliverables/presentation/hra_dashboard_client_presentation.pptx)
-- [Deliverables README](/Users/cinhtw/Documents/Playground/deliverables/README.md)
-
-## Documentation
-
-- [Architecture](/Users/cinhtw/Documents/Playground/docs/architecture.md)
-- [Dashboard layout](/Users/cinhtw/Documents/Playground/docs/dashboard-layout.md)
-- [Data model](/Users/cinhtw/Documents/Playground/docs/data-model.md)
-- [Replication guide](/Users/cinhtw/Documents/Playground/docs/replication-guide.md)
-- [GitHub publishing guide](/Users/cinhtw/Documents/Playground/docs/setup/github-publish.md)
-
 ## Verification
 
 Run tests:
@@ -247,11 +228,3 @@ Run tests:
 ```bash
 python3 -m pytest
 ```
-
-## Power BI note
-
-Power BI is still possible later, but it should sit downstream of this repository. The recommended pattern is:
-
-1. Use this repo to define the canonical DuckDB tables and research logic.
-2. Export aggregate tables if the client needs executive BI dashboards.
-3. Keep the research-focused exploratory analysis in this versioned Streamlit project.
